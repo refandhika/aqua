@@ -1,6 +1,6 @@
 # aqua
 
-cargo-near-new-project-description
+A sample fungible token contract for NEAR Protocol
 
 ## How to Build Locally?
 

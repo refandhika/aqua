@@ -36,6 +36,15 @@ pub enum StorageKey {
 
 #[near_bindgen]
 impl Contract {
+    /// Add reset for development purpose (Remove on production)
+    #[init]
+    pub fn reset(metadata: FungibleTokenMetadata) -> Self {
+        assert!(env::predecessor_account_id() == env::current_account_id(), "Only the contract owner can reset");
+        Self {
+            metadata: LazyOption::new(StorageKey::Metadata, Some(&metadata)),
+        }
+    }
+
     /// Initializes the contract with the given total supply owned by the given `owner_id` with
     /// default metadata (for example purposes only).
     #[init]

@@ -1,7 +1,10 @@
+use near_sdk::BorshStorageKey;
 use near_sdk::borsh::{BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{LazyOption, LookupMap};
-use near_sdk::json_types::U128;
+use near_sdk::json_types::{U128, Base64VecU8};
 use near_sdk::{env, near_bindgen, AccountId, NearToken, PanicOnDefault, StorageUsage, NearSchema};
+
+use hex::decode;
 
 pub mod ft_core;
 pub mod metadata;
@@ -19,13 +22,12 @@ pub const FT_METADATA_SPEC: &str = "ft-1.0.0";
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault)]
 #[borsh(crate = "near_sdk::borsh")]
 pub struct Contract {
-    /*
-        FILL THIS IN
-    */
+    /// Metadata for the contract itself
+    pub metadata: LazyOption<FungibleTokenMetadata>,
 }
 
 /// Helper structure for keys of the persistent collections.
-#[derive(BorshSerialize)]
+#[derive(BorshSerialize, BorshStorageKey)]
 #[borsh(crate = "near_sdk::borsh")]
 pub enum StorageKey {
     Accounts,
@@ -38,10 +40,20 @@ impl Contract {
     /// default metadata (for example purposes only).
     #[init]
     pub fn new_default_meta(owner_id: AccountId, total_supply: U128) -> Self {
-        /*
-            FILL THIS IN
-        */
-        todo!(); //remove once code is filled in.
+         // Calls the other function "new: with some default metadata and the owner_id & total supply passed in 
+        Self::new(
+            owner_id,
+            total_supply,
+            FungibleTokenMetadata {
+                spec: FT_METADATA_SPEC.to_string(),
+                name: "Aqua One".to_string(),
+                symbol: "aAqua".to_string(),
+                icon: Some(DATA_IMAGE_SVG_GT_ICON.to_string()),
+                reference: Some("https://example.com/reference.json".to_string()),
+                reference_hash: Some(Base64VecU8::from(hex::decode("0da1a192df1ecce9841c23e6539d4af19d9212682f7152bd3ea1ce2939422089").unwrap())),
+                decimals: 8,
+            },
+        )
     }
 
     /// Initializes the contract with the given total supply owned by the given `owner_id` with
@@ -52,9 +64,15 @@ impl Contract {
         total_supply: U128,
         metadata: FungibleTokenMetadata,
     ) -> Self {
-        /*
-            FILL THIS IN
-        */
-        todo!(); //remove once code is filled in.
+        // Create a variable of type Self with all the fields initialized. 
+        let this = Self {
+            metadata: LazyOption::new(
+                StorageKey::Metadata,
+                Some(&metadata),
+            )
+        };
+    
+        // Return the Contract object
+        this
     }
 }

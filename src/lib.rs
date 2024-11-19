@@ -49,7 +49,7 @@ pub enum StorageKey {
 impl Contract {
     /// Add reset for development purpose (Remove on production)
     #[init]
-    pub fn reset(metadata: FungibleTokenMetadata) -> Self {
+    pub fn reset(owner_id: AccountId, total_supply: U128, metadata: FungibleTokenMetadata) -> Self {
         assert!(env::predecessor_account_id() == env::current_account_id(), "Only the contract owner can reset");
 
         let casted_total_supply = NearToken::from_yoctonear(total_supply.0);
@@ -58,7 +58,7 @@ impl Contract {
             total_supply: casted_total_supply,
             accounts: LookupMap::new(StorageKey::Accounts),
             metadata: LazyOption::new(StorageKey::Metadata, Some(&metadata)),
-        }
+        };
 
         // Set the owner's balance to the total supply
         this.internal_deposit(&owner_id, casted_total_supply);

@@ -51,9 +51,27 @@ impl Contract {
     #[init]
     pub fn reset(metadata: FungibleTokenMetadata) -> Self {
         assert!(env::predecessor_account_id() == env::current_account_id(), "Only the contract owner can reset");
-        Self {
+
+        let casted_total_supply = NearToken::from_yoctonear(total_supply.0);
+
+        let mut this = Self {
+            total_supply: casted_total_supply,
+            accounts: LookupMap::new(StorageKey::Accounts),
             metadata: LazyOption::new(StorageKey::Metadata, Some(&metadata)),
         }
+
+        // Set the owner's balance to the total supply
+        this.internal_deposit(&owner_id, casted_total_supply);
+
+        // Emit a reset event or initial mint event
+        FtMint {
+            owner_id: &owner_id,
+            amount: &casted_total_supply,
+            memo: Some("Token supply reset and reinitialized"),
+        }
+        .emit();
+
+        this
     }
 
     /// Initializes the contract with the given total supply owned by the given `owner_id` with
@@ -86,7 +104,7 @@ impl Contract {
     ) -> Self {
         let casted_total_supply = NearToken::from_yoctonear(total_supply.0);
         // Create a variable of type Self with all the fields initialized. 
-        let this = Self {
+        let mut this = Self {
             // Set the total supply
             total_supply: casted_total_supply,
             accounts: LookupMap::new(StorageKey::Accounts),

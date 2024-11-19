@@ -4,6 +4,7 @@ use near_sdk::serde::Serialize;
 use near_sdk::env;
 
 #[derive(Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
 #[serde(tag = "standard")]
 #[must_use = "don't forget to `.emit()` this event"]
 #[serde(rename_all = "snake_case")]
@@ -33,6 +34,7 @@ impl<'a> NearEvent<'a> {
 /// Data to log for an FT mint event. To log this event, call [`.emit()`](FtMint::emit).
 #[must_use]
 #[derive(Serialize, Debug, Clone)]
+#[serde(crate = "near_sdk::serde")]
 pub struct FtMint<'a> {
     pub owner_id: &'a AccountId,
     pub amount: &'a NearToken,
@@ -58,6 +60,7 @@ impl FtMint<'_> {
 /// call [`.emit()`](FtTransfer::emit).
 #[must_use]
 #[derive(Serialize, Debug, Clone)]
+#[serde(crate = "near_sdk::serde")]
 pub struct FtTransfer<'a> {
     pub old_owner_id: &'a AccountId,
     pub new_owner_id: &'a AccountId,
@@ -81,6 +84,7 @@ impl FtTransfer<'_> {
 }
 
 #[derive(Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
 pub(crate) struct Nep141Event<'a> {
     version: &'static str,
     #[serde(flatten)]
@@ -88,6 +92,7 @@ pub(crate) struct Nep141Event<'a> {
 }
 
 #[derive(Serialize, Debug)]
+#[serde(crate = "near_sdk::serde")]
 #[serde(tag = "event", content = "data")]
 #[serde(rename_all = "snake_case")]
 #[allow(clippy::enum_variant_names)]
